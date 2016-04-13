@@ -1,8 +1,10 @@
-package org.gm.docdrive;
+package org.gm.docdrive.commons;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Scanner;
+
+import org.gm.docdrive.DocDriveImpl;
 
 public class TestingMain {
 
@@ -21,7 +23,7 @@ public class TestingMain {
 					try {
 					
 						if(splits.length==2){
-							drive.createFile(splits[1]);
+							drive.createFile(splits[1],"");
 						}
 						else
 							System.out.println("COMANDO NON CORRETTO");
@@ -34,7 +36,7 @@ public class TestingMain {
 				
 				case "ls": 
 					try {
-						drive.listFiles().stream().forEach(n->System.out.println(n));
+						drive.listFiles("").stream().forEach(n->System.out.println(n));
 					} catch (IOException e) {
 						if(e instanceof FileAlreadyExistsException)
 							System.err.println("FILE ESISTENTE");
@@ -45,7 +47,7 @@ public class TestingMain {
 
 						if(splits.length==2){
 							try {
-								drive.changeDirectory(splits[1]);
+								drive.changeDirectory(splits[1],"");
 							} catch (IOException e) {
 								System.err.println("PERCORSO NON VALIDO");
 
@@ -57,7 +59,7 @@ public class TestingMain {
 					try {
 						
 						if(splits.length==2){
-							drive.createFolder(splits[1]);
+							drive.createFolder(splits[1],"");
 						}
 						else
 							System.out.println("COMANDO NON CORRETTO");

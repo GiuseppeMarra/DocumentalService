@@ -8,16 +8,19 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gm.docdrive.api.interfaces.DocDriveServices;
+import org.gm.docdrive.commons.Constants;
+
 public class DocDriveImpl implements DocDriveServices {
 
-	public File createFile(String name) throws IOException {
+	public File createFile(String name, String authToken) throws IOException {
 
 		Path p = Files.createFile(Constants.CURRENT.resolve(name));
 		return p.toFile();
 
 	}
 
-	public String changeDirectory(String path) throws IOException
+	public String changeDirectory(String path, String authToken) throws IOException
 	{
 		Path pathInput = Paths.get(path).normalize();
 		if(pathInput!=null){
@@ -34,7 +37,7 @@ public class DocDriveImpl implements DocDriveServices {
 		throw new IOException();
 	}
 
-	public List<String> listFiles() throws IOException {
+	public List<String> listFiles(String authToken) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
 		Files.list(Constants.CURRENT)
 			 .forEach(n -> res.add(n.toFile().getName()));
@@ -44,7 +47,7 @@ public class DocDriveImpl implements DocDriveServices {
 	}
 
 	@Override
-	public File createFolder(String name) throws IOException {
+	public File createFolder(String name, String authToken) throws IOException {
 
 		Path p = Files.createDirectories(Constants.CURRENT.resolve(name));
 		return p.toFile();

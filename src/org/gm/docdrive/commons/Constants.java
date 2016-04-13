@@ -1,4 +1,4 @@
-package org.gm.docdrive;
+package org.gm.docdrive.commons;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
