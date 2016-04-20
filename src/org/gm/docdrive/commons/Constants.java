@@ -10,5 +10,6 @@ public class Constants {
 	private static String MAIN_PATH0 ="/Users/giuseppe/Documents/docdrive_repo/";
 	public static Path MAIN_PATH =Paths.get(MAIN_PATH0);
 	public static Path CURRENT = Paths.get(MAIN_PATH0);
+	public static String ROOT_ID="cb0a9126-457f-4acd-94b6-28c7c77f3601";
 
 }

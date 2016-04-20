@@ -1,4 +1,6 @@
-package org.gm.docdrive.dao.interfaces;
+package org.gm.docdrive;
+
+import org.gm.docdrive.dao.interfaces.Message;
 
 public class Response<T> {
 	

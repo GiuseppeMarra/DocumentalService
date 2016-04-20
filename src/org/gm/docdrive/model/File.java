@@ -4,8 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class File {
 	
 	public enum Kind{
@@ -32,36 +36,37 @@ public class File {
 		private String name;
 		private String mimeType;
 		private String description;
-		private boolean starred;
-		private boolean trashed;
-		private File parent;
+		private String parent;
 		private Map<String, String> properties;
-		private long version;
-		private String webContentLink;
-		private Date viewedByMeTime; //"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+		
+		@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 		private Date createdTime;
+		
+		@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 		private Date modifiedTime;
-		private Date modifiedByMeTime;
-		private Date sharedWithMeTime;
-		private User sharingUser;
-		private List<User> owners;
-		private User lastModifyingUser;
-		private boolean shared;
-		private boolean ownedByMe;
-		private List<Capability> capabilities;
-		private List<Permission> permissions;
+		
 		private String fullFileExtension;
 		private String fileExtension;
 		private String md5Checksum;
 		private Long size;
 		
 		
+		public File(){
+			super();
+		}
+		
+		public File(String id){
+			super();
+			this.id=id;
+			
+		}
+		
 		
 		public String getId() {
 			return id;
 		}
 
-		protected void setId(String id){
+		public void setId(String id){
 			this.id=id;
 		}
 		public String getName() {
@@ -82,42 +87,11 @@ public class File {
 		public void setDescription(String description) {
 			this.description = description;
 		}
-		public boolean isStarred() {
-			return starred;
-		}
-		public void setStarred(boolean starred) {
-			this.starred = starred;
-		}
-		public boolean isTrashed() {
-			return trashed;
-		}
-		public void setTrashed(boolean trashed) {
-			this.trashed = trashed;
-		}
-
 		public Map<String, String> getProperties() {
 			return properties;
 		}
 		public void setProperties(Map<String, String> properties) {
 			this.properties = properties;
-		}
-		public long getVersion() {
-			return version;
-		}
-		public void setVersion(long version) {
-			this.version = version;
-		}
-		public String getWebContentLink() {
-			return webContentLink;
-		}
-		public void setWebContentLink(String webContentLink) {
-			this.webContentLink = webContentLink;
-		}
-		public Date getViewedByMeTime() {
-			return viewedByMeTime;
-		}
-		public void setViewedByMeTime(Date viewedByMeTime) {
-			this.viewedByMeTime = viewedByMeTime;
 		}
 		public Date getCreatedTime() {
 			return createdTime;
@@ -131,60 +105,7 @@ public class File {
 		public void setModifiedTime(Date modifiedTime) {
 			this.modifiedTime = modifiedTime;
 		}
-		public Date getModifiedByMeTime() {
-			return modifiedByMeTime;
-		}
-		public void setModifiedByMeTime(Date modifiedByMeTime) {
-			this.modifiedByMeTime = modifiedByMeTime;
-		}
-		public Date getSharedWithMeTime() {
-			return sharedWithMeTime;
-		}
-		public void setSharedWithMeTime(Date sharedWithMeTime) {
-			this.sharedWithMeTime = sharedWithMeTime;
-		}
-		public User getSharingUser() {
-			return sharingUser;
-		}
-		public void setSharingUser(User sharingUser) {
-			this.sharingUser = sharingUser;
-		}
-		public List<User> getOwners() {
-			return owners;
-		}
-		public void setOwners(List<User> owners) {
-			this.owners = owners;
-		}
-		public User getLastModifyingUser() {
-			return lastModifyingUser;
-		}
-		public void setLastModifyingUser(User lastModifyingUser) {
-			this.lastModifyingUser = lastModifyingUser;
-		}
-		public boolean isShared() {
-			return shared;
-		}
-		public void setShared(boolean shared) {
-			this.shared = shared;
-		}
-		public boolean isOwnedByMe() {
-			return ownedByMe;
-		}
-		public void setOwnedByMe(boolean ownedByMe) {
-			this.ownedByMe = ownedByMe;
-		}
-		public List<Capability> getCapabilities() {
-			return capabilities;
-		}
-		public void setCapabilities(List<Capability> capabilities) {
-			this.capabilities = capabilities;
-		}
-		public List<Permission> getPermissions() {
-			return permissions;
-		}
-		public void setPermissions(List<Permission> permissions) {
-			this.permissions = permissions;
-		}
+		
 		public String getFullFileExtension() {
 			return fullFileExtension;
 		}
@@ -216,11 +137,11 @@ public class File {
 			this.kind = kind;
 		}
 
-		public File getParent() {
+		public String getParent() {
 			return parent;
 		}
 
-		public void setParent(File parent) {
+		public void setParent(String parent) {
 			this.parent = parent;
 		}
 

@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import org.gm.docdrive.api.interfaces.DocDriveServices;
 import org.gm.docdrive.commons.Constants;
 
-public class DocDriveImpl implements DocDriveServices {
+public class DocDriveImpl_old implements DocDriveServices {
 
 	public File createFile(String name, String authToken) throws IOException {
 
