@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 import org.gm.docdrive.api.interfaces.DocDriveServices;
 import org.gm.docdrive.commons.Constants;
@@ -37,12 +38,12 @@ public class DocDriveImpl implements DocDriveServices {
 		throw new IOException();
 	}
 
-	public List<String> listFiles(String authToken) throws IOException {
+	public Response listFiles(String authToken) throws IOException {
 		ArrayList<String> res = new ArrayList<String>();
 		Files.list(Constants.CURRENT)
 			 .forEach(n -> res.add(n.toFile().getName()));
 
-		return res;
+		return null;
 
 	}
 

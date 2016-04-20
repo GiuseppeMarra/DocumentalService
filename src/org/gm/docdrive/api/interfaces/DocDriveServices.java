@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.ws.rs.core.Response;
+
 public interface DocDriveServices {
 	
 	
@@ -14,7 +16,7 @@ public interface DocDriveServices {
 	
 	public String changeDirectory(String path, String authToken) throws IOException;
 
-	public List<String> listFiles(String authToken) throws IOException;
+	public Response listFiles(String authToken) throws IOException;
 	
 	
 	
