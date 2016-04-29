@@ -1,17 +1,21 @@
 package org.gm.docdrive;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.gm.docdrive.commons.Constants;
 import org.gm.docdrive.dao.interfaces.FileDAO;
 import org.gm.docdrive.dao.interfaces.FileDAOException;
 import org.gm.docdrive.dao.interfaces.FileDAOFactory;
+import org.gm.docdrive.dao.interfaces.Message;
 import org.gm.docdrive.model.File;
 import org.gm.docdrive.model.File.Kind;
 
@@ -42,7 +46,7 @@ public class DocDrive {
 	}
 
 	public File getFile(File f){
-		
+
 		try {
 			return dao.getFile(f);
 		} catch (FileDAOException e) {
@@ -50,6 +54,24 @@ public class DocDrive {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public InputStream dowloadFileAsStream(File f) throws IllegalArgumentException{
+
+		File real = getFile(f);
+		if(real.getKind().equals(Kind.FOLDER)){
+			throw new IllegalArgumentException("Cannot download folder as stream");
+		}
+
+		Path p = Constants.MAIN_PATH.resolve(real.getId());
+		FileInputStream fis=null;
+		try {
+			fis = new FileInputStream(p.toFile());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return fis;
+
 	}
 
 	public List<File> list(File parent){
@@ -67,23 +89,58 @@ public class DocDrive {
 
 	}
 
+	public Message addProperty(File target, String key, String value){
+
+		File f = getFile(target); //TODO check more then one or check if the id is set
+		Map<String, String> properties = f.getProperties();
+		if(properties == null){
+			properties = new HashMap<String, String>();
+			f.setProperties(properties);
+		}
+		properties.put(key, value);
+		updateFile(new File(f.getId()),f);
+		return Message.SUCCESS;
+
+	}
+
+	public Message addProperties(File target, Map<String, String> props){
+
+		File f = getFile(target);
+		Map<String, String> properties = f.getProperties();
+		if(properties == null){
+			properties = new HashMap<String, String>();
+		}
+		properties.putAll(props);
+		updateFile(new File(f.getId()),f);
+		return Message.SUCCESS;
+
+	}
+
+
+	private void updateFile(File filter, File toUpdate) {
+
+		try {
+			dao.updateFile(filter, toUpdate);
+		} catch (FileDAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
 
 	public File insertFolder(File f) throws FileDAOException {
 		//DB management
-				f.setKind(Kind.FOLDER);
-				f.setId(UUID.randomUUID().toString());
-				dao.insertFile(f);
+		f.setKind(Kind.FOLDER);
+		f.setId(UUID.randomUUID().toString());
+		dao.insertFile(f);
 
-				
-
-				try {
-					return dao.getFile(f);
-				} catch (FileDAOException e) {
-					e.printStackTrace();
-					return f;
-				}
-
-		
+		try {
+			return dao.getFile(f);
+		} catch (FileDAOException e) {
+			e.printStackTrace();
+			return f;
+		}	
 	}
 
 }

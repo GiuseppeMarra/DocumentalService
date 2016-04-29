@@ -13,7 +13,7 @@ import org.gm.docdrive.dao.interfaces.Message;
 import org.gm.docdrive.model.File;
 import org.gm.docdrive.model.File.Kind;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
@@ -50,9 +50,7 @@ public class MongoFileDAO implements FileDAO {
 
 		String jsonString ="{}";
 		try {
-			mapper.setSerializationInclusion(Include.ALWAYS);
 			jsonString = mapper.writeValueAsString(f);
-			mapper.setSerializationInclusion(Include.NON_NULL);
 
 			
 		} catch (JsonProcessingException e) {
@@ -134,5 +132,28 @@ public class MongoFileDAO implements FileDAO {
 
 		return res;
 	}
+
+
+	@Override
+	public Message updateFile(File filter, File toUpdate) throws FileDAOException{
+		toUpdate.setModifiedTime(new Date());
+		toUpdate.setId(null);
+		String jsonFilter = null;
+		String jsonToUpdate = null;
+		try {
+			jsonFilter = mapper.writeValueAsString(filter);
+			jsonToUpdate = mapper.writeValueAsString(toUpdate);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return Message.DB_MODEL_CREATION_FILED;
+		}
+
+		Document searchFilter = Document.parse(jsonFilter);
+		Document toUpdateDoc = Document.parse(jsonToUpdate);
+		db.updateMany(searchFilter, new Document("$set", toUpdateDoc));
+		return Message.SUCCESS;
+	}
+		
+	
 
 }

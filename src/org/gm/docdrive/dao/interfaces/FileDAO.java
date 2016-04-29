@@ -15,4 +15,7 @@ public interface FileDAO {
 	
 	public List<File> list(File parent) throws FileDAOException;
 
+
+	public Message updateFile(File filter, File toUpdate) throws FileDAOException;
+
 }

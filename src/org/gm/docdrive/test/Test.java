@@ -19,28 +19,33 @@ import com.mongodb.client.MongoCollection;
 public class Test {
 
 	public static void main(String[] args) throws JsonProcessingException {
-
+		
 //		insertRoot();
 		DocDrive drive = new DocDrive();
-//
-		File f  = new File();
-		f.setName("11File.txt");
-		f.setParent("1cb50429-e3c6-492a-87d4-137b167406ab");
 		
+		//Insert a file
+		File f  = new File();
+		f.setName("14File.txt");
+		f.setParent("7f8973bf-3ff6-4212-a95a-2e3abd9120f0"); //a previously created folder
+		
+		File inserted = null;
 		try {
-			drive.insertFile(f, new FileInputStream("test.txt"));
+			inserted = drive.insertFile(f, new FileInputStream("test.txt"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//Update the inserted file
+		drive.addProperty(inserted, "test", "success3");
+		
+		
+		//Print the tree
 		File root = drive.getFile(new File(Constants.ROOT_ID));
 		print(drive,root,0);
 		
 		
 
 		
-//		ObjectMapper mapper = new ObjectMapper();
-//		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(f));
 
 		
 	}
@@ -49,7 +54,7 @@ public class Test {
 	public static void print(DocDrive drive, File f, int level){
 	
 		for(int i=0;i<level;i++) System.out.print("---");
-		System.out.println(f.getName());
+		System.out.println(f.getName()+"-----("+f.getId()+")");
 		if(f.getKind().equals(Kind.FOLDER)){
 			List<File> c = drive.list(f);
 			for (File sub : c){
@@ -62,7 +67,7 @@ public class Test {
 	}
 	
 	
-	private static void insertRoot(){
+	public static void insertRoot(){
 		
 		File f = new File();
 		f.setName("root");
@@ -76,6 +81,7 @@ public class Test {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		client.close();
 	}
 
 }
