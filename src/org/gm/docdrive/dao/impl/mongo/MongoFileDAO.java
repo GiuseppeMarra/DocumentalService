@@ -153,6 +153,22 @@ public class MongoFileDAO implements FileDAO {
 		db.updateMany(searchFilter, new Document("$set", toUpdateDoc));
 		return Message.SUCCESS;
 	}
+
+
+	@Override
+	public File delete(File f) throws FileDAOException {
+		String jsonFilter = null;
+		try{
+			jsonFilter = mapper.writeValueAsString(f);
+		}
+		catch(JsonProcessingException e){
+			e.printStackTrace();
+			return null;
+		}
+		Document mongoFilter = Document.parse(jsonFilter);
+		db.deleteMany(mongoFilter);
+		return f;
+	}
 		
 	
 

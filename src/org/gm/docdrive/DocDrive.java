@@ -117,7 +117,7 @@ public class DocDrive {
 	}
 
 
-	private void updateFile(File filter, File toUpdate) {
+	public void updateFile(File filter, File toUpdate) {
 
 		try {
 			dao.updateFile(filter, toUpdate);
@@ -125,11 +125,11 @@ public class DocDrive {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 	}
 
-	public File insertFolder(File f) throws FileDAOException {
+	public File insertFolder(File f) {
 		//DB management
 		f.setKind(Kind.FOLDER);
 		f.setId(UUID.randomUUID().toString());
@@ -141,6 +141,15 @@ public class DocDrive {
 			e.printStackTrace();
 			return f;
 		}	
+	}
+
+	public File delete(File f){
+		try{
+			return dao.delete(f);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

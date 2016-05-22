@@ -18,4 +18,6 @@ public interface FileDAO {
 
 	public Message updateFile(File filter, File toUpdate) throws FileDAOException;
 
+	public File delete(File f) throws FileDAOException;
+
 }

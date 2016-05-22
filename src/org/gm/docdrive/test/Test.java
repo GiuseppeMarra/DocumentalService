@@ -1,7 +1,5 @@
 package org.gm.docdrive.test;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
 
 import org.bson.Document;
@@ -24,31 +22,26 @@ public class Test {
 		DocDrive drive = new DocDrive();
 		
 		//Insert a file
-		File f  = new File();
-		f.setName("14File.txt");
-		f.setParent("7f8973bf-3ff6-4212-a95a-2e3abd9120f0"); //a previously created folder
+//		File f  = new File();
+//		f.setName("14File.txt");
+//		f.setParent("7f8973bf-3ff6-4212-a95a-2e3abd9120f0"); //a previously created folder
+//		
+//		File inserted = null;
+//		try {
+//			inserted = drive.insertFile(f, new FileInputStream("test.txt"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		//Update the inserted file
+//		drive.addProperty(inserted, "test", "success3");
 		
-		File inserted = null;
-		try {
-			inserted = drive.insertFile(f, new FileInputStream("test.txt"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		//Update the inserted file
-		drive.addProperty(inserted, "test", "success3");
-		
+//		drive.delete(new File("ddc36838-478d-443e-b3fb-bc39bc552b08"));
 		
 		//Print the tree
 		File root = drive.getFile(new File(Constants.ROOT_ID));
 		print(drive,root,0);
-		
-		
-
-		
-
-		
-	}
+		}
 	
 	
 	public static void print(DocDrive drive, File f, int level){
