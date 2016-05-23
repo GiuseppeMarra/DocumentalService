@@ -4,8 +4,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +34,26 @@ public class DocDrive {
 		//DB management
 		f.setKind(Kind.FILE);
 		f.setId(UUID.randomUUID().toString());
-		dao.insertFile(f);
-
+		
 		//FS management
 		Path p = Constants.MAIN_PATH.resolve(f.getId());
-		Files.copy(is,p);
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("MD5");
+			try (InputStream stream = is){
+			     DigestInputStream dis = new DigestInputStream(stream, md);
+				 Files.copy(dis,p);
+			}
+			f.setSize(p.toFile().length());
+			f.setMd5Checksum(new BigInteger(1, md.digest()).toString(16));
+			System.out.println(f.getMd5Checksum());
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		dao.insertFile(f);
+
 
 		try {
 			return dao.getFile(f);

@@ -1,5 +1,7 @@
 package org.gm.docdrive.ws.api;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -8,10 +10,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.gm.docdrive.DocDrive;
 import org.gm.docdrive.dao.interfaces.Message;
 import org.gm.docdrive.model.File;
@@ -22,25 +28,63 @@ public class DocDriveAPI extends Application {
 	private DocDrive drive = new DocDrive();
 
 	
-//	static{
-//		// Create JAX-RS application.
-//		final Application application = new ResourceConfig()
-//		    .packages("org.glassfish.jersey.examples.multipart")
-//		    .register(MultiPartFeature.class);
-//	}
-//	
-//	@POST
-//	@Produces("application/json")
-//	@Consumes(MediaType.MULTIPART_FORM_DATA)
-//	public File insertFile(@FormDataParam("file") File f, InputStream is) throws IOException {
-//
-//		return drive.insertFile(f, is);
-//
-//	}
+	
+	@POST
+	@Produces("application/json")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Path("upload")
+	public Response insertFile(@FormDataParam("file") InputStream fileInputStream,
+			@FormDataParam("file") FormDataContentDisposition contentDispositionHeader, @FormDataParam("parentId") String parentId) {
 
-	public File getFile(File f) {
+		File f = new File();
+		f.setName(contentDispositionHeader.getFileName());
+		f.setCreatedTime(contentDispositionHeader.getCreationDate());
+		f.setModifiedTime(contentDispositionHeader.getModificationDate());
+		f.setParent(parentId);
+		try {
+			drive.insertFile(f, fileInputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Response.status(500).build();
+		}
 
-		return drive.getFile(f);
+
+		return Response.status(200).build();
+
+	}
+
+
+	@GET
+	@Produces("application/json")
+	@Path("download/{fileId}")
+	public Response downloadFile(@PathParam("fileId") String fileId) {
+
+		StreamingOutput fileStream =  new StreamingOutput() 
+        {
+            @Override
+            public void write(java.io.OutputStream out) throws IOException, WebApplicationException 
+            {
+                try
+                {
+                	InputStream in =  drive.dowloadFileAsStream(new File(fileId));
+                	byte[] buffer = new byte[16384];
+                	int len;
+                	while ((len = in.read(buffer)) != -1) {
+                	    out.write(buffer, 0, len);
+                	}
+                    out.flush();
+                } 
+                catch (Exception e) 
+                {
+                    throw new WebApplicationException("File Not Found !!");
+                }
+            }
+        };
+        File f = drive.getFile(new File(fileId));
+        return Response
+                .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition","attachment; filename = "+f.getName())
+                .build();
 	}
 
 	@GET
@@ -62,7 +106,7 @@ public class DocDriveAPI extends Application {
 
 	public Message addProperties(File target, Map<String, String> props) {
 
-		return addProperties(target, props);
+		return drive.addProperties(target, props);
 
 	}
 
@@ -83,11 +127,13 @@ public class DocDriveAPI extends Application {
 		
 	}
 
-
-	public File delete(File f) {
-		
-		return drive.delete(f);
-		
+	@POST
+	@Produces("application/json")
+	@Path("delete/{fileId}")
+	public Response delete(@PathParam("fileId") String fileId) {
+		File f = new File(fileId);
+		drive.delete(f);
+		return Response.status(200).build();
 	}
 
 }
