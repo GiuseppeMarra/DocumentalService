@@ -1,38 +1,31 @@
-package org.gm.docdrive.model;
+package org.gm.docdrive.ws.model;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.gm.docdrive.model.File.Kind;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class File {
+public class FileVW {
 	
-	public enum Kind{
-		FILE("docdrive/file"), FOLDER("docdrive/folder");
-		
-		private String name;
-		
-		private Kind(String name){
-			this.setName(name);
-		}
-		
-		@JsonValue
-		public String getName(){
-			return this.name;
-		}
 
-		public void setName(String name) {
-			this.name = name;
-		}
-	}
 	
+		@Override
+	public String toString() {
+		return "FileVW [kind=" + kind + ", id=" + id + ", name=" + name + ", mimeType=" + mimeType + ", description="
+				+ description + ", parent=" + parent + ", properties=" + properties + ", createdTime=" + createdTime
+				+ ", modifiedTime=" + modifiedTime + ", fullFileExtension=" + fullFileExtension + ", fileExtension="
+				+ fileExtension + ", md5Checksum=" + md5Checksum + ", size=" + size + ", owner=" + owner
+				+ ", sharedWith=" + sharedWith + "]";
+	}
+
 		private Kind kind; 
 		private String id;
 		private String name;
@@ -52,16 +45,30 @@ public class File {
 		private String md5Checksum;
 		private Long size;
 		
-		private UserRight owner;
-		private List<UserRight> sharedWith;
-		
+		private UserVW owner;
+		private List<UserVW> sharedWith;
 
+		public UserVW getOwner() {
+			return owner;
+		}
 
-		public File(){
+		public void setOwner(UserVW owner) {
+			this.owner = owner;
+		}
+
+		public List<UserVW> getSharedWith() {
+			return sharedWith;
+		}
+
+		public void setSharedWith(List<UserVW> sharedWith) {
+			this.sharedWith = sharedWith;
+		}
+
+		public FileVW(){
 			super();
 		}
 		
-		public File(String id){
+		public FileVW(String id){
 			super();
 			this.id=id;
 			
@@ -151,49 +158,5 @@ public class File {
 			this.parent = parent;
 		}
 
-		public List<UserRight> getSharedWith() {
-			return sharedWith;
-		}
-
-		public void setSharedWith(List<UserRight> sharedWith) {
-			this.sharedWith = sharedWith;
-		}
-
-		public UserRight getOwner() {
-			return owner;
-		}
-
-		public void setOwner(UserRight owner) {
-			this.owner = owner;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((id == null) ? 0 : id.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			File other = (File) obj;
-			if (id == null) {
-				if (other.id != null)
-					return false;
-			} else if (!id.equals(other.id))
-				return false;
-			return true;
-		}
-
-
-		
-		
 
 }

@@ -11,5 +11,6 @@ public class Constants {
 	public static Path MAIN_PATH =Paths.get(MAIN_PATH0);
 	public static Path CURRENT = Paths.get(MAIN_PATH0);
 	public static String ROOT_ID="cb0a9126-457f-4acd-94b6-28c7c77f3601";
+	public static String TOKEN_KEY = "IAYDcy5wr+IIfsLqwVG8Ow==";
 
 }
