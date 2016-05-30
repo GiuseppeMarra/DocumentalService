@@ -163,6 +163,7 @@ public class DocDriveAPI extends Application {
 	}
 
 	@POST
+	@RequiresAuthorization
 	@Produces("application/json")
 	@Path("{id}/delete")
 	public Response delete(@PathParam("id") String fileId) {
