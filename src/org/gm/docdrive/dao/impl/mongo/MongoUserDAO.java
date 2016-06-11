@@ -12,6 +12,7 @@ import org.gm.docdrive.model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 
 public class MongoUserDAO implements UserDAO{
@@ -70,6 +71,49 @@ public class MongoUserDAO implements UserDAO{
 			}
 		}
 		return users;
+	}
+
+	@Override
+	public User insertUser(User u) {
+		String jsonString ="{}";
+		try {
+			jsonString = mapper.writeValueAsString(u);
+
+
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		Document mongoFile = Document.parse(jsonString);
+		db.insertOne(mongoFile);
+		try {
+			return getUser(u);
+		} catch (UserDAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}		
+	}
+
+	@Override
+	public boolean checkForUsername(String username) {
+
+		String filter = "{ \"username\": \""+username+"\"}";
+		FindIterable<Document> res = db.find(Document.parse(filter));
+		if(res.iterator().hasNext())
+			return false;
+		return true;
+	}
+
+	@Override
+	public boolean checkForEmail(String email) {
+		
+		String filter = "{ \"emailAddress\": \""+email+"\"}";
+		FindIterable<Document> res = db.find(Document.parse(filter));
+		if(res.iterator().hasNext())
+			return false;
+		return true;
 	}
 
 }

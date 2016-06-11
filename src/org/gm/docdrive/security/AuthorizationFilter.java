@@ -67,9 +67,9 @@ public class AuthorizationFilter implements ContainerRequestFilter{
 				action = encodedRelativePath.substring(index+1);
 
 
-				switch(secman.authorize(token, fileId, action)){
+				switch(secman.authorize(token, fileId, action).getStatus()){
 
-				case ALLOWED:{
+				case TOKEN_VALID:{
 
 					return;
 				}

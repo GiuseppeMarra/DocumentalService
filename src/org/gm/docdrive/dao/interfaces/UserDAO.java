@@ -10,4 +10,10 @@ public interface UserDAO {
 
 	public List<User> getUsersFromIds(List<String> sharedWith) throws UserDAOException;
 
+	public User insertUser(User u);
+
+	public boolean checkForUsername(String username);
+
+	public boolean checkForEmail(String email);
+
 }

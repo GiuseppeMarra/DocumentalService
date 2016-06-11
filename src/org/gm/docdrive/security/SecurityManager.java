@@ -18,6 +18,7 @@ import org.gm.docdrive.dao.interfaces.UserDAOFactory;
 import org.gm.docdrive.model.File;
 import org.gm.docdrive.model.User;
 import org.gm.docdrive.model.UserRight.Right;
+import org.gm.docdrive.security.SecurityManager.SecurityResponse.Status;
 import org.gm.docdrive.util.SecurityUtil;
 
 import io.jsonwebtoken.Jwts;
@@ -31,8 +32,48 @@ public class SecurityManager {
 	}
 
 
-	public static enum Response{
-		ALLOWED, NOT_ALLOWED, EXPIRED, TOKEN_NOT_RECOGNIZED
+	public static class SecurityResponse<T>{
+
+		public T value;
+		public Status status;
+
+		public Status getStatus() {
+			return status;
+		}
+
+		public void setStatus(Status status) {
+			this.status = status;
+		}
+
+		public void setValue(T value){
+			this.value = value;
+		}
+
+		public T getValue(){
+			return value;
+		}
+
+		public static enum Status{
+
+			TOKEN_VALID("The request is allowed. The token is valid and is authorized to that request."), 
+			NOT_ALLOWED("The request is not allowed. Token is valid but not authorized to execute this request"), 
+			EXPIRED("The token is expired. Renew it."), 
+			TOKEN_NOT_VALID("The provided token is not valid."),
+			USERNAME_ALREADY_USED("The provided username is already used."), 
+			USERNAME_VALID("The provided username is valid."), 
+			EMAIL_VALID("The provided email is valid."),
+			EMAIL_ALREADY_USED("The provided email is already used."), 
+			USER_OK("The provided user is constructed well.");
+
+			private String value;
+			private Status(String value){
+				this.value = value;
+			}
+
+			public String getValue(){
+				return value;
+			}
+		}
 	}
 
 	private FileDAO fileDao =FileDAOFactory.getInstance();
@@ -41,10 +82,13 @@ public class SecurityManager {
 
 	public SecurityManager(){}
 
-	public Response authorize(String token, String fileId, String action){
+	public SecurityResponse<Boolean> authorize(String token, String fileId, String action){
 
+		SecurityResponse<Boolean> res = new SecurityResponse<Boolean>();
 		if(fileId == null){
-			return Response.ALLOWED; //TODO Implicit root request
+			res.setValue(true);
+			res.setStatus(SecurityResponse.Status.TOKEN_VALID);
+			return res;//TODO Implicit root request
 		}
 		File f = new File();
 		f.setId(fileId);
@@ -53,12 +97,19 @@ public class SecurityManager {
 
 		Right r  = manager.isFileAllowed(token, f);
 		if(r==null){
-			return Response.TOKEN_NOT_RECOGNIZED;
+			res.setValue(false);
+			res.setStatus(Status.TOKEN_NOT_VALID);
+			return res;
 		}
-		if(r==Right.READ && actionRequiredRights.get(action)==Right.WRITE)
-			return Response.NOT_ALLOWED;
+		if(r==Right.READ && actionRequiredRights.get(action)==Right.WRITE){
+			res.setValue(false);
+			res.setStatus(Status.NOT_ALLOWED);
+			return res;
+		}
 
-		return Response.ALLOWED;
+		res.setValue(true);
+		res.setStatus(SecurityResponse.Status.TOKEN_VALID);
+		return res;
 
 
 	}
@@ -132,6 +183,59 @@ public class SecurityManager {
 		TokenManager manager = TokenManagerFactory.getInstance();
 		manager.addAllowedFile(res,u);
 
+	}
+
+	public SecurityResponse<Boolean> validateUser(User u) {
+
+		SecurityResponse<Boolean> res = checkForUsername(u.getUsername());
+		if(!res.getValue()){
+			return res;
+		}
+		res = checkForEmail(u.getEmailAddress());
+		if(!res.getValue()){
+			return res;
+		}
+
+		res = new SecurityResponse<Boolean>();
+		res.setValue(true);
+		res.setStatus(Status.USER_OK);
+		return res;
+	}
+
+	public SecurityResponse<Boolean> checkForUsername(String username) {
+		
+		Boolean res = userDao.checkForUsername(username);
+		SecurityResponse<Boolean> result = new SecurityResponse<Boolean>();
+		if(res){
+			result.setStatus(Status.USERNAME_VALID);
+			result.setValue(true);
+		}
+		else{
+			result.setStatus(Status.USERNAME_ALREADY_USED);
+			result.setValue(false);
+		}
+		return result;
+		
+	}
+
+	public void register(User u) {
+
+		userDao.insertUser(u);
+	}
+
+	public SecurityResponse<Boolean> checkForEmail(String email) {
+		// TODO Auto-generated method stub
+		Boolean res = userDao.checkForEmail(email);
+		SecurityResponse<Boolean> result = new SecurityResponse<Boolean>();
+		if(res){
+			result.setStatus(Status.EMAIL_VALID);
+			result.setValue(true);
+		}
+		else{
+			result.setStatus(Status.EMAIL_ALREADY_USED);
+			result.setValue(false);
+		}
+		return result;
 	}
 
 }
